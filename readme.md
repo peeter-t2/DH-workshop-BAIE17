@@ -22,6 +22,10 @@ For a different kind of approach to the same data, you can also install antconc:
 2) Run git
 3) type "git clone https://github.com/peeter-t2/DH-workshop-BAIE17.git"
 
+Alternatively:
+1) Click on the download .zip link in the top right green button, or follow this link: https://github.com/peeter-t2/DH-workshop-BAIE17/archive/master.zip
+2) Unpack the files where you want them.
+
 ## Running the files
 
 Using the workshop script files requires the right packages to have been installed. Before you run any of the files, run the install_script.R file to install the packages. You need internet connection for that.
