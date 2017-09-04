@@ -32,8 +32,8 @@ Using the workshop script files requires the right packages to have been install
 
 ## Workshop 1
 
-Workshop 1 will work with gutenbergr_workshop.R file. We will work through it during the workshop.
+Workshop 1 will work with workshop1_gutenbergr.R file. We will work through it during the workshop.
 
 ## Workshop 2
 
-Workshop 2 will work with the hofmeister_workshop.R file. We will also work through it during the workshop.
+Workshop 2 will work with the workshop2_hofmeister.R file. We will also work through it during the workshop.
