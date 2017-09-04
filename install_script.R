@@ -3,5 +3,5 @@
 
 #A pre-installation script for the required packages
 
-lapply(c("tidytext", "gutenbergr", "dplyr", "scales", "ggplot2","zoo","igraph","ggraph","tm","scales","readr","grid"), 
+lapply(c("tidytext", "gutenbergr", "dplyr", "scales", "ggplot2","zoo","igraph","ggraph","tm","scales","readr","grid","stringr","tidyr","humaniformat","gender"), 
        function(x) if(!is.element(x, installed.packages())) install.packages(x, dependencies = T))

@@ -4,7 +4,7 @@
 #Workshop 2 materials.
 #Here we look at in more detail how you could go about processing a single text.
 #We use more packages here than in workshop 1.
-lapply(c("tidytext", "gutenbergr", "dplyr", "scales", "ggplot2","zoo","igraph","ggraph","tm","scales","readr","grid"), 
+lapply(c("tidytext", "gutenbergr", "dplyr", "scales", "ggplot2","zoo","igraph","ggraph","tm","scales","readr","grid","stringr"), 
        function(x) if(!is.element(x, installed.packages())) install.packages(x, dependencies = T))
 
 #Then we read the packages into R environment.
@@ -16,6 +16,8 @@ library(ggraph)
 library(tm)
 library(scales)
 library(readr)
+library(stringr)
+library(tidyr)
 
 
 hofmeister <- read.table("data/7hfms10.txt", sep="\t",quote = "",header=FALSE,blank.lines.skip=FALSE,stringsAsFactors=F)#,  fileEncoding = "UTF-8"
@@ -46,11 +48,13 @@ hofmeister <- hofmeister %>%
 
 #mark beginning of play itself
 hofmeister <- hofmeister %>%
-  mutate(is_text=ifelse(lead(line)=="Erster Akt",yes="text",no="not_text"))
+  mutate(is_text=ifelse(lead(line)=="Erster Akt.",yes="text",no=NA))
+#na.locf - fill the NAs before or after data
+hofmeister <- na.locf(hofmeister)
 
 #there's useful information before
 namelist <- hofmeister %>%
-  filter(is_text=="not_text")
+  filter(is.na(is_text))
 write.csv(namelist,"names_raw.csv")
 
 
@@ -181,9 +185,10 @@ wordcountperscene <- dialogues %>%
 #x=akt:name - the combination of act and name
 linecountperscene %>% 
   filter(!is.na(nameshort)) %>%
+  filter(!is.na(akt)) %>%
   mutate(name=factor(nameshort)) %>%
   arrange(desc(scene)) %>%
-  ggplot(aes(x=akt:name,y=n,fill=scene)) +#interaction(akt,scene)
+  ggplot(aes(x=interaction(akt,nameshort),y=n,fill=scene)) +#interaction(akt,scene)
   geom_col() +
   labs(x = NULL, y = "number of lines")+
   coord_flip()
@@ -194,7 +199,7 @@ linecountperscene %>%
   filter(!is.na(nameshort)) %>%
   mutate(name=factor(nameshort)) %>%
   arrange(desc(scene)) %>%
-  ggplot(aes(x=name,y=n,group=akt,fill=scene))
+  ggplot(aes(x=name,y=n,group=akt,fill=scene))+
   geom_col() +
   labs(x = NULL, y = "number of lines")+
   coord_flip()+
@@ -432,6 +437,9 @@ declinated <- sentiment_df %>%
 
 bind_rows(basic,declinated) -> de_sent
 
+dial_words <- dialogues %>%
+  unnest_tokens(word, line) %>%
+  anti_join(stop_wordsde, by = "word")
 
 dial_sentiments <- dial_words %>%
   inner_join(de_sent, by = c(word = "word")) %>%
