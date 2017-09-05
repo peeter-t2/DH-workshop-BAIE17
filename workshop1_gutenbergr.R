@@ -3,7 +3,7 @@
 
 
 #First we check if the packages are installed, and install if needed.
-lapply(c("tidytext", "gutenbergr", "dplyr", "scales", "ggplot2","scales","stringr","humaniformat","gender"), 
+lapply(c("tidytext", "gutenbergr", "dplyr", "scales", "ggplot2","stringr","humaniformat","gender","purrr","readr"),
        function(x) if(!is.element(x, installed.packages())) install.packages(x, dependencies = T))
 
 #Then we read the packages into R environment.
@@ -13,7 +13,9 @@ library(dplyr)
 library(scales)
 library(ggplot2)
 library(stringr)
-
+library(tidyr)
+library(readr)
+library(purrr)
 
 #Recommended to turn on soft-wrap:
 #Tools -> Global options -> Code -> Editing -> Soft-wrap R source files (turn it on)
@@ -21,7 +23,7 @@ library(stringr)
 
 #The library "gutenbergr" gave us some data to work with, for example "gutenberg_metadata"
 #To look at a variable we just type it in
-gutenberg_metadata
+View(gutenberg_metadata)
 
 
 
@@ -31,8 +33,15 @@ gutenberg_metadata
 # filter - take subset of the data
 # str_detect - find part of string
 
+#basic model is the following
+#data %>%
+  #process()
+
 gutenberg_metadata %>%
   filter(str_detect(author,"Wells, H. G."))
+
+gutenberg_metadata %>%
+  filter(str_detect(author,"Austen"))
 
 gutenberg_metadata %>%
   filter(str_detect(title,"Time Machine"))
@@ -64,8 +73,10 @@ gutenberg_metadata %>%
   filter(str_detect(author,"Verne, Jules")) %>%
   filter(str_detect(language,"en")) -> jverne_index
 
-hgwells_texts <- gutenberg_download(hgwells_index$gutenberg_id[1:15], meta_fields = "title")
-jverne_texts <- gutenberg_download(jverne_index$gutenberg_id[1:15], meta_fields = "title")
+#hgwells_texts <- gutenberg_download(hgwells_index$gutenberg_id[1:15], meta_fields = "title")
+#jverne_texts <- gutenberg_download(jverne_index$gutenberg_id[1:15], meta_fields = "title")
+#lazy option with no internet
+load("data/wells_verne.RData")
 
 #count (number of lines per book)
 hgwells_texts %>%
@@ -93,10 +104,6 @@ hgwells_texts %>%
   anti_join(stop_words, by = "word") %>%
   group_by(title) %>%
   count(word, sort = TRUE)
-
-#################
-#########compare <- bind_rows("neg" = neg_df, "pos" = pos_df, .id = "neg_pos") -> sentiment_df
-###################
 
 #let's make two groups
 comparison1 <- hgwells_texts %>%
@@ -408,8 +415,8 @@ detective_index <- gutenberg_subjects %>%
 
 #Let's download Tarzan and Robinson Crusoe collections
 #the numbers behing gutenberg_id, say which books to take, for now, don't take more than 20, as downloading will otherwise take too much time
-tarzan_texts <- gutenberg_download(tarzan_index$gutenberg_id[1:8], meta_fields = "title")
-crusoe_texts <- gutenberg_download(crusoe_index$gutenberg_id[1:8], meta_fields = "title")
+#tarzan_texts <- gutenberg_download(tarzan_index$gutenberg_id[1:8], meta_fields = "title")
+#crusoe_texts <- gutenberg_download(crusoe_index$gutenberg_id[1:8], meta_fields = "title")
 
 #check the texts we got
 tarzan_texts %>%
@@ -428,8 +435,8 @@ crusoe_texts %>%
 #detective_texts <- gutenberg_download(detective_index$gutenberg_id[1:19], meta_fields = "title")
 
 #If you can't connect to internet with the gutenberg_download function, you can simply open the example datasets
-#load("data/austen_bronte_shelley.RData")
-#load("data/tarzan_crusoe.RData")
+load("data/austen_bronte_shelley.RData")
+load("data/tarzan_crusoe.RData")
 #load("data/wells_verne.RData")
 
 
@@ -519,3 +526,16 @@ c19_authors %>%
 
 c19_authors %>%
   filter(gender=="female")
+
+
+############################
+#####Extra 2
+###########################
+
+#Read your own files
+#Here it reads the files from the corpus included in the dataset
+library(purrr)
+filelist <- list.files("data/corpus/",full.names=T)
+texts <- map_df(filelist, ~ data_frame(txt = read_lines(.x)) %>%
+                  mutate(filename = .x)) %>%
+  mutate(filename= gsub("data/corpus/","",filename))

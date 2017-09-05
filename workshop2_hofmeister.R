@@ -20,7 +20,7 @@ library(stringr)
 library(tidyr)
 
 
-hofmeister <- read.table("data/7hfms10.txt", sep="\t",quote = "",header=FALSE,blank.lines.skip=FALSE,stringsAsFactors=F)#,  fileEncoding = "UTF-8"
+hofmeister <- read.table("data/hofmeister/7hfms10.txt", sep="\t",quote = "",header=FALSE,blank.lines.skip=FALSE,stringsAsFactors=F)#,  fileEncoding = "UTF-8"
 names(hofmeister) <- "line"
 
 
@@ -55,7 +55,7 @@ hofmeister <- na.locf(hofmeister)
 #there's useful information before
 namelist <- hofmeister %>%
   filter(is.na(is_text))
-write.csv(namelist,"names_raw.csv")
+write.csv(namelist,"data/hofmeister/names_raw.csv")
 
 
 hofmeister <- hofmeister %>%
@@ -103,11 +103,11 @@ dialogues <- dialogues %>%
 speakers <- dialogues %>% 
   count(speaker_clean) %>%
   arrange(desc(n))
-write.csv(speakers,"speakers_text.csv")
+write.csv(speakers,"data/hofmeister/speakers_text.csv")
 
 #we can manually combine the files
 #additionally we can add the gender markers to them
-names_gender <- read.csv("data/names.csv",stringsAsFactors = F)
+names_gender <- read.csv("data/hofmeister/names.csv",stringsAsFactors = F)
 
 #we find that even after cleaning, some names still have multiple expressions
 #we can simply replace them
@@ -406,7 +406,7 @@ dialogues %>%
 
 #extra, german sentiments
 
-neg_df <- read_tsv("data/SentiWS_v1.8c_Negative.txt", col_names = FALSE)
+neg_df <- read_tsv("data/sentiments_de/SentiWS_v1.8c_Negative.txt", col_names = FALSE)
 names(neg_df) <- c("Wort_POS", "Wert", "Inflektionen")
 
 glimpse(neg_df)
@@ -416,7 +416,7 @@ neg_df %>%
          POS = str_sub(Wort_POS, start = regexpr("\\|", .$Wort_POS)+1)) -> neg_df
 
 
-pos_df <- read_tsv("data/SentiWS_v1.8c_Positive.txt", col_names = FALSE)
+pos_df <- read_tsv("data/sentiments_de/SentiWS_v1.8c_Positive.txt", col_names = FALSE)
 names(pos_df) <- c("Wort_POS", "Wert", "Inflektionen")
 pos_df %>% 
   mutate(Wort = str_sub(Wort_POS, 1, regexpr("\\|", .$Wort_POS)-1),
