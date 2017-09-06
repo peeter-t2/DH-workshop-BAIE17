@@ -13,6 +13,7 @@ library(tidytext)
 library(ggplot2)
 library(igraph)
 library(ggraph)
+library(dplyr)
 library(tm)
 library(scales)
 library(readr)
@@ -25,9 +26,9 @@ names(hofmeister) <- "line"
 
 
 #same as
-gutenberg_metadata %>%
- filter(title == "Der Hofmeister")
-hofmeister2 <- gutenberg_download(6821)
+#gutenberg_metadata %>%
+ #filter(title == "Der Hofmeister")
+#hofmeister2 <- gutenberg_download(6821)
 
 
 
@@ -167,7 +168,7 @@ participants <- dialogues %>%
 
 #how many lines per person per scene
 linecountperscene <- dialogues %>%
-  group_by(akt, scene, nameshort) %>%
+  group_by(akt, scene, nameshort,gender) %>%
   count(n_distinct(dialrank))
 
 
@@ -194,7 +195,6 @@ linecountperscene %>%
   coord_flip()
 
 
-#############something's wrong with this one....
 linecountperscene %>% 
   filter(!is.na(nameshort)) %>%
   mutate(name=factor(nameshort)) %>%
