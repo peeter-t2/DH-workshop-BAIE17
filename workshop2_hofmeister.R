@@ -19,10 +19,10 @@ library(readr)
 library(stringr)
 library(tidyr)
 library(dplyr)
+library(gutenbergr)
 
 hofmeister <- read.table("data/hofmeister/7hfms10.txt", sep="\t",quote = "",header=FALSE,blank.lines.skip=FALSE,stringsAsFactors=F)#,  fileEncoding = "UTF-8"
 names(hofmeister) <- "line"
-
 
 #same as
 #gutenberg_metadata %>%
@@ -182,7 +182,7 @@ wordcountperscene <- dialogues %>%
   arrange(akt, scene) #same as arrange(akt_scene)
 
 
-#x=akt:name - the combination of act and name
+#x=akt:name or alternatively interaction(akt,nameshort) - the combination of act and name
 linecountperscene %>% 
   filter(!is.na(nameshort)) %>%
   filter(!is.na(akt)) %>%
@@ -238,10 +238,10 @@ linecountperscene %>%
   coord_flip()
 
 #a possible solution just to plot each act separately
-#ggplot facet_wrap size?
+# change the number at unique(dialogues$akt)[1] to choose the particular act. 
 linecountperscene %>% 
   filter(!is.na(nameshort)) %>%
-  filter(akt==unique(dialogues$akt)[3]) %>%
+  filter(akt==unique(dialogues$akt)[5]) %>%
   mutate(name=factor(nameshort)) %>%
   arrange(desc(scene)) %>%
   ggplot(aes(x=name,y=n,fill=gender)) +
@@ -328,11 +328,11 @@ stop_wordsde <- tibble(word=stopwords(kind = "de"))
 dial_M <- dialogues %>%
   filter(gender=="M") %>%
   unnest_tokens(word, line)# %>%
-  anti_join(stop_wordsde, by = "word")
+  #anti_join(stop_wordsde, by = "word")
 dial_F <- dialogues %>%
   filter(gender=="F") %>%
   unnest_tokens(word, line)# %>%
-  anti_join(stop_wordsde, by = "word")
+  #anti_join(stop_wordsde, by = "word")
 
 
 comparison <- dial_M %>%
@@ -459,6 +459,24 @@ sentiments_ordered <- dial_sentiments %>%
 #just use colon for this, for interactions on the ggplot
 sentiments_ordered %>% # plot
   ggplot(aes(x = akt:scene, y = sentiment)) + 
+  geom_bar(stat = "identity", aes(fill = akt)) + 
+  theme_classic() + 
+  theme(axis.text.x = element_text(angle = 90)) + 
+  coord_flip() + 
+  ylim(-50, 50) +
+  ggtitle("Centered sentiment scores", 
+          subtitle = "Acts and Scenes in Hofmeister")
+
+
+#what was the really sad scene all about?
+akt2 <- dialogues %>%
+  filter(akt==unique(dialogues$akt)[2]) %>%
+  filter(scene==unique(dialogues$scene)[5])
+
+
+#same thing for just the negative emotions
+sentiments_ordered %>%
+  ggplot(aes(x = akt:scene, y = neg)) + 
   geom_bar(stat = "identity", aes(fill = akt)) + 
   theme_classic() + 
   theme(axis.text.x = element_text(angle = 90)) + 

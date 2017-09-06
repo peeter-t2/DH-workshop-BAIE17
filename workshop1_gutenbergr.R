@@ -542,8 +542,9 @@ texts <- map_df(filelist, ~ data_frame(txt = read_lines(.x)) %>%
   mutate(filename= gsub("data/corpus/","",filename))
 
 
-
-
+#and then just use the same tricks as above
+texts %>%
+  count(filename)
 
 
 
