@@ -81,6 +81,7 @@ load("data/wells_verne.RData")
 #count (number of lines per book)
 hgwells_texts %>%
   count(title)
+
 jverne_texts %>%
   count(title)
 
@@ -539,3 +540,11 @@ filelist <- list.files("data/corpus/",full.names=T)
 texts <- map_df(filelist, ~ data_frame(txt = read_lines(.x)) %>%
                   mutate(filename = .x)) %>%
   mutate(filename= gsub("data/corpus/","",filename))
+
+
+
+
+
+
+
+

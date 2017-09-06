@@ -13,13 +13,12 @@ library(tidytext)
 library(ggplot2)
 library(igraph)
 library(ggraph)
-library(dplyr)
 library(tm)
 library(scales)
 library(readr)
 library(stringr)
 library(tidyr)
-
+library(dplyr)
 
 hofmeister <- read.table("data/hofmeister/7hfms10.txt", sep="\t",quote = "",header=FALSE,blank.lines.skip=FALSE,stringsAsFactors=F)#,  fileEncoding = "UTF-8"
 names(hofmeister) <- "line"
@@ -242,7 +241,7 @@ linecountperscene %>%
 #ggplot facet_wrap size?
 linecountperscene %>% 
   filter(!is.na(nameshort)) %>%
-  filter(akt==unique(dialogues$akt)[1]) %>%
+  filter(akt==unique(dialogues$akt)[3]) %>%
   mutate(name=factor(nameshort)) %>%
   arrange(desc(scene)) %>%
   ggplot(aes(x=name,y=n,fill=gender)) +
@@ -329,11 +328,11 @@ stop_wordsde <- tibble(word=stopwords(kind = "de"))
 dial_M <- dialogues %>%
   filter(gender=="M") %>%
   unnest_tokens(word, line)# %>%
-  #anti_join(stop_wordsde, by = "word")
+  anti_join(stop_wordsde, by = "word")
 dial_F <- dialogues %>%
   filter(gender=="F") %>%
   unnest_tokens(word, line)# %>%
-  #anti_join(stop_wordsde, by = "word")
+  anti_join(stop_wordsde, by = "word")
 
 
 comparison <- dial_M %>%
